@@ -12,11 +12,11 @@ import numpy
 import theano
 
 from theanolm import Vocabulary, Architecture, Network
+from theanolm.backend import TextFileType
 from theanolm.parsing import LinearBatchIterator
 from theanolm.training import Trainer, create_optimizer, CrossEntropyCost, \
                               NCECost, BlackoutCost
 from theanolm.scoring import TextScorer
-from theanolm.filetypes import TextFileType
 from theanolm.vocabulary import compute_word_counts
 
 def add_arguments(parser):
@@ -405,8 +405,14 @@ def train(args):
         else:
             print("Invalid cost function requested: `{}'".format(args.cost))
             sys.exit(1)
-        optimizer = create_optimizer(optimization_options, network,
-                                     cost_function, profile=args.profile)
+        try:
+            optimizer = create_optimizer(optimization_options, network,
+                                         cost_function, profile=args.profile)
+        except theano.gradient.DisconnectedInputError as e:
+            print("Cannot train the neural network because some of the "
+                  "parameters are disconnected from the output. Make sure all "
+                  "the layers are correctly connected in the network "
+                  "architecture. The error message was: `{}'".format(e))
 
         if args.print_graph:
             print("Cost function computation graph:")

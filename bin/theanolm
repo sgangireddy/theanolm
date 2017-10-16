@@ -8,9 +8,9 @@ import logging
 import sys
 import argparse
 
+from theanolm.backend import NumberError, TheanoConfigurationError
+from theanolm.backend import IncompatibleStateError
 from theanolm.commands import train, score, decode, sample, version
-from theanolm.exceptions import NumberError, TheanoConfigurationError
-from theanolm.exceptions import IncompatibleStateError
 
 def _get_message(e):
     if hasattr(e, 'args') and len(e.args) > 0 and isinstance(e.args[0], bytes):
@@ -83,6 +83,9 @@ def main():
     if hasattr(args, 'command_function'):
         sys.excepthook = exception_handler
         try:
+            # Increasing recursion limit is necessary with deep networks.
+            sys.setrecursionlimit(100000)
+
             args.command_function(args)
         except FileNotFoundError as e:
             print('Could not open one of the required files. The error message '

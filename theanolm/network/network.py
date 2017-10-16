@@ -14,12 +14,15 @@ import theano.tensor as tensor
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 
 from theanolm import Vocabulary
-from theanolm.exceptions import IncompatibleStateError, InputError
+from theanolm.backend import IncompatibleStateError, InputError
+from theanolm.backend import UniformDistribution, LogUniformDistribution
+from theanolm.backend import MultinomialDistribution
+from theanolm.backend import test_value
 from theanolm.network.architecture import Architecture
 from theanolm.network.networkinput import NetworkInput
 from theanolm.network.projectionlayer import ProjectionLayer
 from theanolm.network.fclayer import FullyConnectedLayer
-from theanolm.network.residuallayer import ResidualLayer
+from theanolm.network.additionlayer import AdditionLayer
 from theanolm.network.grulayer import GRULayer
 from theanolm.network.lstmlayer import LSTMLayer
 from theanolm.network.highwaylayer import HighwayLayer
@@ -28,10 +31,6 @@ from theanolm.network.softmaxlayer import SoftmaxLayer
 from theanolm.network.hsoftmaxlayer import HSoftmaxLayer
 from theanolm.network.dropoutlayer import DropoutLayer
 from theanolm.network.bidirectionallayer import BidirectionalLayer
-from theanolm.classdistribution import UniformDistribution, \
-                                       LogUniformDistribution, \
-                                       MultinomialDistribution
-from theanolm.matrixfunctions import test_value
 
 def create_layer(layer_options, *args, **kwargs):
     """Constructs one of the Layer classes based on a layer definition.
@@ -45,8 +44,8 @@ def create_layer(layer_options, *args, **kwargs):
         return ProjectionLayer(layer_options, *args, **kwargs)
     elif layer_type == 'fc' or layer_type == 'tanh':
         return FullyConnectedLayer(layer_options, *args, **kwargs)
-    elif layer_type == 'residual':
-        return ResidualLayer(layer_options, *args, **kwargs)
+    elif layer_type == 'add':
+        return AdditionLayer(layer_options, *args, **kwargs)
     elif layer_type == 'lstm':
         return LSTMLayer(layer_options, *args, **kwargs)
     elif layer_type == 'gru':
