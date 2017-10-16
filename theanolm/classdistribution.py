@@ -200,8 +200,7 @@ class MultinomialDistribution(ClassDistribution):
         probs = self._probs[None, :]
         probs = tensor.tile(probs, [minibatch_size, 1])
 #        return self._random.multinomial_wo_replacement(pvals=probs, n=num_samples)
-        sample = self._random.choice(size=num_samples, replace=False, p=probs,
-                                     target='cpu')
+        sample = self._random.choice(size=num_samples, replace=False, p=probs)
         # Some versions of Theano seem to return crazy high or low numbers because
         # of some rounding errors, so we take the modulo to be safe.
         sample %= probs.shape[1]
